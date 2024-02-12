@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-
 let users = [
     {
         firstName: "John",
@@ -35,13 +34,34 @@ router.get("/:email",(req,res)=>{
   res.send(filtered_users);
 });
 
+// GET users with a particular Last Name eg. 'Smith'
+router.get("/lastName/:lastName",(req,res)=>{
+    const lastName = req.params.lastName;
+    let filtered_lastname = users.filter((user) => user.lastName === lastName);
+    res.send(filtered_lastname);
+});
+
+function getDateFromString(strDate) {
+    let [dd,mm,yyyy] = strDate.split('-');
+    return new Date(yyyy+"/"+mm+"/"+dd);
+}
+    
+// console.log(sorted_users);
+router.get("/sort",(req,res)=>{
+    console.log("Sorting data...");
+    let sorted_users=users.sort(function(a, b) {
+        let d1 = getDateFromString(a.DOB);
+        let d2 = getDateFromString(b.DOB);
+            return d1-d2;
+          });
+    res.send(sorted_users);
+});
 
 // POST request: Create a new user
 router.post("/",(req,res)=>{
   users.push({"firstName":req.query.firstName,"lastName":req.query.lastName,"email":req.query.email,"DOB":req.query.DOB});
   res.send("The user" + (' ')+ (req.query.firstName) + " Has been added!")
 });
-
 
 // PUT request: Update the details of a user by email ID
 router.put("/:email", (req, res) => {
@@ -65,7 +85,6 @@ router.put("/:email", (req, res) => {
       res.send("Unable to find user!");
   }
 });
-
 
 // DELETE request: Delete a user by email ID
 router.delete("/:email", (req, res) => {
